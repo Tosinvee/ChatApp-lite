@@ -51,11 +51,7 @@ export class AuthService {
   async signup(body: CreateUserDto) {
     const existingUser = await this.userService.getUser({ email: body.email });
     if (existingUser) throw new BadRequestException('User already exist');
-    const hashedPassword = await this.userService.hashPassword(body.password);
-    await this.userService.create({
-      ...body,
-      password: hashedPassword,
-    });
+    await this.userService.create(body);
     return {
       message: 'USER signed up sucessfully',
     };
@@ -64,11 +60,15 @@ export class AuthService {
   async verifyUser(email: string, password: string): Promise<User> {
     const user = await this.userService.getUser({ email });
 
+    console.log('INPUT PASSWORD:', password);
+    console.log('DB PASSWORD:', user?.password);
+
     if (!user) {
       throw new UnauthorizedException('Credentials are not valid');
     }
 
     const isValid = await bcrypt.compare(password, user.password);
+    console.log('COMPARE RESULT:', isValid);
 
     if (!isValid) {
       throw new UnauthorizedException('Credentials are not valid');

@@ -16,11 +16,12 @@ export class UserService {
   }
 
   async create(body: CreateUserDto): Promise<User> {
-    const user = await this.userModel.create({
+    const user = new this.userModel({
       ...body,
       password: await this.hashPassword(body.password),
     });
-    return await user.save();
+
+    return user.save();
   }
 
   async getUser(query: Record<string, any>) {
