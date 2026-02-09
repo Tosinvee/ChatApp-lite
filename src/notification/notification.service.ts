@@ -19,27 +19,25 @@ export class NotificationService {
   async sendToUserHybrid(params: {
     userId: string;
     title: string;
-    body: string;
+    content: string;
     data?: Record<string, any>;
   }) {
-    const { userId, title, body, data } = params;
+    const { userId, title, content, data } = params;
 
     const notification = await this.notificationModel.create({
       userId,
       title,
-      body,
+      content,
       data,
     });
     const activeDeviceIds = await this.presenseService.getActiveDevices(userId);
     if (activeDeviceIds.length > 0) {
-      activeDeviceIds.forEach(() =>
-        this.gateway.sendToUser(userId, {
-          title,
-          body,
-          data,
-          notificationId: notification._id,
-        }),
-      );
+      this.gateway.sendToUser(userId, {
+        title,
+        content,
+        data,
+        notificationId: notification._id,
+      });
     }
   }
 }

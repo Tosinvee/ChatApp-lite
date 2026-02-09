@@ -10,7 +10,7 @@ export class Notification extends Document {
   title: string;
 
   @Prop({ required: true })
-  body: string;
+  content: string;
 
   @Prop({ default: 'PUSH' })
   channel: 'PUSH' | 'SOCKET';
