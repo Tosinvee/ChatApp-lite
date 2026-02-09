@@ -16,7 +16,7 @@ import { TokenPayload } from './interface/token.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { RefreshToken } from 'src/user/schema/refresh-token.schema';
 import { Model } from 'mongoose';
-import redisClient from 'src/utils/redisClient';
+import { RedisService } from 'src/utils/redisClient';
 
 @Injectable()
 export class AuthService {
@@ -27,13 +27,9 @@ export class AuthService {
     private configService: ConfigService,
     @InjectModel(RefreshToken.name)
     private readonly refreshTokenModel: Model<RefreshToken>,
+    private redisService: RedisService,
   ) {
     this.logger = new Logger(AuthService.name);
-  }
-
-  async onModuleDestroy() {
-    await redisClient.quit();
-    this.logger.log('Redis connection gracefully closed');
   }
 
   generateRefreshToken() {
@@ -85,11 +81,10 @@ export class AuthService {
       token: dbHash,
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
-    await redisClient.set(
+    await this.redisService.set(
       `refresh:${redisHash}`,
       refreshToken._id.toString(),
-      'EX',
-      30 * 24 * 60 * 60,
+      { EX: 30 * 24 * 60 * 60 },
     );
   }
 

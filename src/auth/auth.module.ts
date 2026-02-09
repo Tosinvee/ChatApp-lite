@@ -11,6 +11,7 @@ import { User, UserSchema } from 'src/user/schema/user.schema';
 import { JwtService } from '@nestjs/jwt';
 import { LocalStrategy } from './strategy/local.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { RedisService } from 'src/utils/redisClient';
 
 @Module({
   imports: [
@@ -26,7 +27,13 @@ import { JwtStrategy } from './strategy/jwt.strategy';
     ]),
     UserModule,
   ],
-  providers: [AuthService, JwtService, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    RedisService,
+    JwtService,
+    LocalStrategy,
+    JwtStrategy,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}
